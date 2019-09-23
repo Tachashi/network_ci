@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<topology xmlns="http://www.cisco.com/VIRL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="0.95" xsi:schemaLocation="http://www.cisco.com/VIRL https://raw.github.com/CiscoVIRL/schema/v0.95/virl.xsd">
+    <extensions>
+        <entry key="management_lxc" type="Boolean">false</entry>
+        <entry key="management_network" type="String">flat</entry>
+        <entry key="AutoNetkit.address_family" type="String">None</entry>
+    </extensions>
+    <node name="iosv-1" type="SIMPLE" subtype="IOSv" location="305,224">
+        <extensions>
+            <entry key="ansible_group" type="String">ios</entry>
+            <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
+            <entry key="config" type="String">! IOS Config generated on 2019-09-23 06:26&#xD;
+! by autonetkit_0.24.1&#xD;
+!&#xD;
+hostname iosv-1&#xD;
+boot-start-marker&#xD;
+boot-end-marker&#xD;
+!&#xD;
+vrf definition Mgmt-intf&#xD;
+!&#xD;
+ address-family ipv4&#xD;
+ exit-address-family&#xD;
+ !&#xD;
+ address-family ipv6&#xD;
+ exit-address-family&#xD;
+!&#xD;
+!&#xD;
+!&#xD;
+no aaa new-model&#xD;
+!&#xD;
+!&#xD;
+ip cef&#xD;
+ipv6 unicast-routing&#xD;
+ipv6 cef&#xD;
+!&#xD;
+!&#xD;
+service timestamps debug datetime msec&#xD;
+service timestamps log datetime msec&#xD;
+no service password-encryption&#xD;
+no service config&#xD;
+enable password cisco&#xD;
+ip classless&#xD;
+ip subnet-zero&#xD;
+no ip domain lookup&#xD;
+ip domain name virl.info&#xD;
+crypto key generate rsa modulus 768&#xD;
+ip ssh server algorithm authentication password&#xD;
+username cisco privilege 15 secret cisco&#xD;
+line vty 0 4&#xD;
+ transport input ssh telnet&#xD;
+ exec-timeout 720 0&#xD;
+ password cisco&#xD;
+ login local&#xD;
+line con 0&#xD;
+ password cisco&#xD;
+!&#xD;
+no cdp run&#xD;
+!&#xD;
+!&#xD;
+interface Loopback0&#xD;
+  description Loopback&#xD;
+  no ip address&#xD;
+!&#xD;
+interface GigabitEthernet0/0&#xD;
+  description OOB Management&#xD;
+  vrf forwarding Mgmt-intf&#xD;
+  ! Configured on launch&#xD;
+  no ip address&#xD;
+  duplex full&#xD;
+  speed auto&#xD;
+  no shutdown&#xD;
+!&#xD;
+interface GigabitEthernet0/1&#xD;
+  description to asav-1&#xD;
+  no ip address&#xD;
+  duplex full&#xD;
+  speed auto&#xD;
+  no shutdown&#xD;
+!&#xD;
+!&#xD;
+!&#xD;
+!&#xD;
+ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 {{ gateway }}&#xD;
+!&#xD;
+end</entry>
+        </extensions>
+        <interface id="0" name="GigabitEthernet0/1"/>
+    </node>
+    <node name="asav-1" type="SIMPLE" subtype="ASAv" location="428,224">
+        <extensions>
+            <entry key="ansible_group" type="String">asa</entry>
+            <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
+            <entry key="config" type="String">! ASAv Config generated on 2019-09-23 06:26&#xD;
+! by autonetkit_0.24.1&#xD;
+!&#xD;
+hostname asav-1&#xD;
+username cisco password cisco privilege 15&#xD;
+enable password cisco&#xD;
+passwd cisco&#xD;
+names&#xD;
+!&#xD;
+interface GigabitEthernet0/0&#xD;
+  description to iosv-1&#xD;
+  duplex full&#xD;
+  nameif outside&#xD;
+  security-level 0&#xD;
+  no shutdown&#xD;
+  no ip address&#xD;
+interface GigabitEthernet0/1&#xD;
+  description to nx-osv9000-1&#xD;
+  duplex full&#xD;
+  nameif outside-1&#xD;
+  security-level 0&#xD;
+  no shutdown&#xD;
+  no ip address&#xD;
+interface Management0/0&#xD;
+  description OOB Management&#xD;
+  duplex full&#xD;
+  management-only&#xD;
+  nameif mgmt&#xD;
+  security-level 100&#xD;
+  no shutdown&#xD;
+  ! Configured on launch&#xD;
+  no ip address&#xD;
+!&#xD;
+same-security-traffic permit inter-interface&#xD;
+logging enable&#xD;
+logging asdm informational&#xD;
+user-identity default-domain LOCAL&#xD;
+aaa authentication ssh console LOCAL&#xD;
+http server enable&#xD;
+http 0.0.0.0 0.0.0.0 mgmt&#xD;
+ssh 0.0.0.0 0.0.0.0 mgmt&#xD;
+telnet 0.0.0.0 0.0.0.0 mgmt&#xD;
+http 0.0.0.0 0.0.0.0 outside&#xD;
+ssh 0.0.0.0 0.0.0.0 outside&#xD;
+telnet 0.0.0.0 0.0.0.0 outside&#xD;
+http 0.0.0.0 0.0.0.0 outside-1&#xD;
+ssh 0.0.0.0 0.0.0.0 outside-1&#xD;
+telnet 0.0.0.0 0.0.0.0 outside-1&#xD;
+ssh version 2&#xD;
+crypto key generate rsa modulus 768&#xD;
+telnet timeout 15&#xD;
+console timeout 0&#xD;
+username cisco password cisco privilege 15&#xD;
+!&#xD;
+class-map inspection_default&#xD;
+ match default-inspection-traffic&#xD;
+!&#xD;
+!&#xD;
+policy-map type inspect dns preset_dns_map&#xD;
+ parameters&#xD;
+  message-length maximum client auto&#xD;
+  message-length maximum 512&#xD;
+policy-map global_policy&#xD;
+ class inspection_default&#xD;
+  inspect ip-options&#xD;
+  inspect netbios&#xD;
+  inspect rtsp&#xD;
+  inspect sunrpc&#xD;
+  inspect tftp&#xD;
+  inspect xdmcp&#xD;
+  inspect dns preset_dns_map&#xD;
+  inspect ftp&#xD;
+  inspect h323 h225&#xD;
+  inspect h323 ras&#xD;
+  inspect rsh&#xD;
+  inspect esmtp&#xD;
+  inspect sqlnet&#xD;
+  inspect sip&#xD;
+  inspect skinny&#xD;
+  inspect icmp&#xD;
+  inspect http&#xD;
+!&#xD;
+service-policy global_policy global&#xD;
+no call-home reporting anonymous&#xD;
+call-home&#xD;
+ profile CiscoTAC-1&#xD;
+  no active&#xD;
+route mgmt 0.0.0.0 0.0.0.0 {{ gateway }}&#xD;
+end&#xD;
+        </entry>
+        </extensions>
+        <interface id="0" name="GigabitEthernet0/0"/>
+        <interface id="1" name="GigabitEthernet0/1"/>
+    </node>
+    <node name="nx-osv9000-1" type="SIMPLE" subtype="NX-OSv 9000" location="570,224">
+        <extensions>
+            <entry key="ansible_group" type="String">nxos</entry>
+            <entry key="AutoNetkit.mgmt_ip" type="string"></entry>
+            <entry key="config" type="String">! NX-OSv Config generated on 2019-09-23 06:26&#xD;
+! by autonetkit_0.24.1&#xD;
+!&#xD;
+version 6.2(1)&#xD;
+license grace-period&#xD;
+!&#xD;
+hostname nx-osv9000-1&#xD;
+vdc nx-osv9000-1 id 1&#xD;
+  limit-resource vlan minimum 16 maximum 4094&#xD;
+  limit-resource vrf minimum 2 maximum 4096&#xD;
+  limit-resource port-channel minimum 0 maximum 768&#xD;
+  limit-resource u4route-mem minimum 96 maximum 96&#xD;
+  limit-resource u6route-mem minimum 24 maximum 24&#xD;
+  limit-resource m4route-mem minimum 58 maximum 58&#xD;
+  limit-resource m6route-mem minimum 8 maximum 8&#xD;
+&#xD;
+feature telnet&#xD;
+&#xD;
+&#xD;
+username adminbackup password 5 ! role network-operator&#xD;
+username admin password 5 $1$KuOSBsvW$Cy0TSD..gEBGBPjzpDgf51 role network-admin&#xD;
+username cisco password 5 $1$Nk7ZkwH0$fyiRmMMfIheqE3BqvcL0C1 role network-operator&#xD;
+username cisco role network-admin&#xD;
+username lab password 5 $1$buoy/oqy$.EXQz8rCn72ii8qtdldj00 role network-admin&#xD;
+no password strength-check&#xD;
+ip domain-lookup&#xD;
+copp profile strict&#xD;
+snmp-server user lab network-admin auth md5 0x5ceb414591539ee35159fca86fdfa101 priv 0x5ceb414591539ee35159fca86fdfa101 localizedkey&#xD;
+snmp-server user admin network-admin auth md5 0x328945d53e05e8e7207f8c20b142f0b7 priv 0x328945d53e05e8e7207f8c20b142f0b7 localizedkey&#xD;
+snmp-server user cisco network-operator auth md5 0x55b3c64a53fb95518e75358ee75e82e9 priv 0x55b3c64a53fb95518e75358ee75e82e9 localizedkey&#xD;
+snmp-server user cisco network-admin&#xD;
+rmon event 1 log trap public description FATAL(1) owner PMON@FATAL&#xD;
+rmon event 2 log trap public description CRITICAL(2) owner PMON@CRITICAL&#xD;
+rmon event 3 log trap public description ERROR(3) owner PMON@ERROR&#xD;
+rmon event 4 log trap public description WARNING(4) owner PMON@WARNING&#xD;
+rmon event 5 log trap public description INFORMATION(5) owner PMON@INFO&#xD;
+&#xD;
+&#xD;
+vlan 1&#xD;
+&#xD;
+vrf context management&#xD;
+  ip route 0.0.0.0/0 {{ gateway }}&#xD;
+hardware forwarding unicast trace&#xD;
+&#xD;
+interface Loopback0&#xD;
+  description Loopback&#xD;
+  no ip address&#xD;
+&#xD;
+interface Ethernet1/1&#xD;
+  description to asav-1&#xD;
+  no switchport&#xD;
+  no ip address&#xD;
+  mac-address fa16.3e00.0001&#xD;
+  no shutdown&#xD;
+&#xD;
+interface mgmt0&#xD;
+  description OOB Management&#xD;
+  ! Configured on launch&#xD;
+  no ip address&#xD;
+  mac-address fa16.3e00.0002&#xD;
+  no shutdown&#xD;
+  vrf member management&#xD;
+&#xD;
+&#xD;
+line console&#xD;
+line vty&#xD;
+        </entry>
+            <entry key="AutoNetkit.ibgp_role" type="String">Peer</entry>
+        </extensions>
+        <interface id="0" name="Ethernet1/1"/>
+    </node>
+    <annotations/>
+    <connection dst="/virl:topology/virl:node[2]/virl:interface[1]" src="/virl:topology/virl:node[1]/virl:interface[1]"/>
+    <connection dst="/virl:topology/virl:node[3]/virl:interface[1]" src="/virl:topology/virl:node[2]/virl:interface[2]"/>
+</topology>
