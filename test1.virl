@@ -80,7 +80,7 @@ interface GigabitEthernet0/1&#xD;
 !&#xD;
 !&#xD;
 !&#xD;
-ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 {{ gateway }}&#xD;
+ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 172.16.30.254&#xD;
 !&#xD;
 end</entry>
         </extensions>
@@ -177,7 +177,7 @@ no call-home reporting anonymous&#xD;
 call-home&#xD;
  profile CiscoTAC-1&#xD;
   no active&#xD;
-route mgmt 0.0.0.0 0.0.0.0 {{ gateway }}&#xD;
+route mgmt 0.0.0.0 0.0.0.0 172.16.30.254&#xD;
 end&#xD;
         </entry>
         </extensions>
@@ -229,7 +229,7 @@ rmon event 5 log trap public description INFORMATION(5) owner PMON@INFO&#xD;
 vlan 1&#xD;
 &#xD;
 vrf context management&#xD;
-  ip route 0.0.0.0/0 {{ gateway }}&#xD;
+  ip route 0.0.0.0/0 172.16.30.254&#xD;
 hardware forwarding unicast trace&#xD;
 &#xD;
 interface Loopback0&#xD;
