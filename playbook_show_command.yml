@@ -1,0 +1,14 @@
+--
+
+- hosts: cisco
+  gather_facts: no
+
+  tasks:
+    - name: run show command
+      cisco.ios.ios_command:
+        commands:
+          - show users
+
+    - name: debug
+      debug:
+        msg: "{{ result.stdout_lines[0] }}"
