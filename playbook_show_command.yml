@@ -7,7 +7,7 @@
     - name: run show command
       ios_command:
         commands:
-          - show users
+          - "{{ show_command }}"
       register: result
 
     - name: debug
